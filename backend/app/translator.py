@@ -18,13 +18,18 @@ class Translator:
             self._tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME)
             self._model = AutoModelForSeq2SeqLM.from_pretrained(self.MODEL_NAME)
 
-    def translate(self, text: str, source: str, target: str) -> str:
+    def translate_batch(self, texts: list[str], source: str, target: str) -> list[str]:
         self._load()
         self._tokenizer.src_lang = _NLLB_CODES[source]
-        inputs = self._tokenizer(text, return_tensors="pt")
+        inputs = self._tokenizer(
+            texts, return_tensors="pt", padding=True, truncation=True, max_length=256
+        )
         output = self._model.generate(
             **inputs,
             forced_bos_token_id=self._tokenizer.convert_tokens_to_ids(_NLLB_CODES[target]),
             max_length=256,
         )
-        return self._tokenizer.batch_decode(output, skip_special_tokens=True)[0]
+        return self._tokenizer.batch_decode(output, skip_special_tokens=True)
+
+    def translate(self, text: str, source: str, target: str) -> str:
+        return self.translate_batch([text], source, target)[0]

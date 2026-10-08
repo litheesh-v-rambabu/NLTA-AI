@@ -9,6 +9,9 @@ class FakeTranslator:
     def translate(self, text, source, target):
         return f"[{source}->{target}] {text}"
 
+    def translate_batch(self, texts, source, target):
+        return [f"[{source}->{target}] {t}" for t in texts]
+
 
 def test_health_returns_ok():
     response = client.get("/health")
@@ -51,4 +54,40 @@ def test_translate_uses_translator_and_detects_source():
 
 def test_translate_rejects_unsupported_target():
     response = client.post("/translate", json={"text": "Hello", "target_lang": "xx"})
+    assert response.status_code == 400
+
+
+def test_batch_keeps_order_and_count():
+    app.dependency_overrides[get_translator] = lambda: FakeTranslator()
+    try:
+        response = client.post(
+            "/translate/batch",
+            json={
+                "texts": ["Bonjour le monde", "Merci beaucoup", "Au revoir, à bientôt"],
+                "target_lang": "en",
+            },
+        )
+    finally:
+        app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["source_lang"] == "fr"
+    assert len(body["translations"]) == 3
+    assert body["translations"][1].endswith("Merci beaucoup")
+
+
+def test_batch_rejects_empty_list():
+    response = client.post("/translate/batch", json={"texts": [], "target_lang": "en"})
+    assert response.status_code == 422
+
+
+def test_batch_rejects_too_many_texts():
+    response = client.post(
+        "/translate/batch", json={"texts": ["hello"] * 51, "target_lang": "fr"}
+    )
+    assert response.status_code == 422
+
+
+def test_batch_rejects_unsupported_target():
+    response = client.post("/translate/batch", json={"texts": ["Hello"], "target_lang": "xx"})
     assert response.status_code == 400
