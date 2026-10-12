@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "NLTA Translator",
+    "version": "0.1.0",
+    "description": "Translate web pages in place using your own translation server.",
+    "action": {
+      "default_popup": "popup/popup.html",
+      "default_title": "NLTA"
+    },
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["http://localhost:8000/*"]
+  }

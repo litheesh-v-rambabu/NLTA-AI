@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>NLTA</title>
+  <style>
+    body {
+      width: 260px;
+      padding: 12px;
+      font-family: system-ui, sans-serif;
+    }
+
+    h1 {
+      font-size: 16px;
+      margin: 0 0 10px;
+    }
+
+    button {
+      padding: 6px 10px;
+    }
+
+    #status {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>NLTA</h1>
+  <button id="check">Check server</button>
+  <p id="status" role="status" aria-live="polite">Not checked yet.</p>
+  <hr>
+  <button id="scan">Scan this page</button>
+  <p id="scan-result" role="status" aria-live="polite"></p>
+  <script src="popup.js"></script>
+</body>
+
+</html>
