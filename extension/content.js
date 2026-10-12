@@ -17,7 +17,6 @@
         if (!parent) return NodeFilter.FILTER_REJECT;
         if (SKIP_TAGS.has(parent.tagName.toUpperCase())) return NodeFilter.FILTER_REJECT;
         if (parent.isContentEditable) return NodeFilter.FILTER_REJECT;
-        if (!isNearViewport(parent)) return NodeFilter.FILTER_REJECT;
         if (!parent.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       },
@@ -26,8 +25,15 @@
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
   
+    const batch = nodes.slice(0, 50);
+    window.__nlta = {
+      nodes: batch,
+      originals: batch.map((n) => n.nodeValue),
+    };
+  
     return {
       count: nodes.length,
       sample: nodes.slice(0, 5).map((n) => n.nodeValue.trim().slice(0, 40)),
+      texts: batch.map((n) => n.nodeValue.trim()),
     };
   })();
