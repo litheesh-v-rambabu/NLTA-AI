@@ -17,6 +17,7 @@
         if (!parent) return NodeFilter.FILTER_REJECT;
         if (SKIP_TAGS.has(parent.tagName.toUpperCase())) return NodeFilter.FILTER_REJECT;
         if (parent.isContentEditable) return NodeFilter.FILTER_REJECT;
+        if (!isNearViewport(parent)) return NodeFilter.FILTER_REJECT;
         if (!parent.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       },
